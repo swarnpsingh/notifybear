@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notifybear/screens/auth_screens/entry_screen.dart';
+import 'package:notifybear/screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: EntryScreen(),
+      home: SplashScreen(),
     );
   }
 }
