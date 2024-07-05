@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:notifybear/screens/auth_screens/login_page.dart';
+import 'package:notifybear/screens/auth_screens/sign_up_page.dart';
 import 'package:notifybear/shared/my_colors.dart';
 import 'package:notifybear/widgets/outline_button.dart';
 
@@ -44,9 +46,21 @@ class _EntryScreenState extends State<EntryScreen> {
                   ),
                 ),
                 SizedBox(height: 50),
-                OutlineButton(text: 'LOGIN', onPressed: () {}),
+                OutlineButton(
+                    text: 'LOGIN',
+                    onPressed: () {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => LoginPage()));
+                    }),
                 SizedBox(height: 25),
-                OutlineButton(text: 'SIGN UP', onPressed: () {})
+                OutlineButton(
+                    text: 'SIGN UP',
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SignUpPage()));
+                    })
               ],
             ),
           ),
