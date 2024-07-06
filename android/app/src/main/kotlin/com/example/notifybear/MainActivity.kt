@@ -1,4 +1,4 @@
-package com.example.notifybear
+package com.notifybear.app
 
 import io.flutter.embedding.android.FlutterActivity
 

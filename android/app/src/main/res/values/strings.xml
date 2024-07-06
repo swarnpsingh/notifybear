@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">notifyBear</string>
+    <string name="facebook_app_id">8159688890786150</string>
+    <string name="fb_login_protocol_scheme">fb8159688890786150</string>
+    <string name="facebook_client_token">50912366a4349bf301de3cae0b7c76d8</string>
+</resources>
