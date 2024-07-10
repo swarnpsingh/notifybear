@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notifybear/models/social_platform.dart';
+import 'package:notifybear/screens/welcome_screen.dart';
 
 import '../shared/my_colors.dart';
 
@@ -58,34 +59,41 @@ class _AddPlatformsState extends State<AddPlatforms> {
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const SizedBox(
                   height: 10,
                 ),
-                const Text(
-                  'Add Social Platforms',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: const Text(
+                    'Add Social Platforms',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.start,
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search Apps',
-                    hintStyle: TextStyle(color: Colors.grey[600]),
-                    prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                    filled: true,
-                    fillColor: const Color(0xFF2C2C2E),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
+                Container(
+                  width: 360,
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search Apps',
+                      hintStyle: TextStyle(color: Colors.grey[600]),
+                      prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                      filled: true,
+                      fillColor: const Color(0xFF2C2C2E),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
+                    style: const TextStyle(color: Colors.white),
                   ),
-                  style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 20),
                 Expanded(
@@ -105,8 +113,8 @@ class _AddPlatformsState extends State<AddPlatforms> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Container(
-                              width: 80,
-                              height: 80,
+                              width: 100,
+                              height: 100,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(15),
@@ -114,20 +122,20 @@ class _AddPlatformsState extends State<AddPlatforms> {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    height: 5,
+                                    height: 10,
                                   ),
                                   Image.asset(
                                     displayedPlatforms[index].iconPath,
-                                    width: 40,
-                                    height: 40,
+                                    width: 50,
+                                    height: 50,
                                   ),
                                   const SizedBox(height: 5),
                                   Text(
                                     displayedPlatforms[index].name,
                                     style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold),
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -142,7 +150,12 @@ class _AddPlatformsState extends State<AddPlatforms> {
                   height: 60,
                   width: 200,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => WelcomeScreen()));
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(
