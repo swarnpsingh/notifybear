@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:notifybear/screens/auth_screens/forgot_password.dart';
 import 'package:notifybear/screens/auth_screens/sign_up_page.dart';
+import 'package:notifybear/services/firebase_auth_services.dart';
 
 import '../../shared/my_colors.dart';
 
@@ -9,6 +12,28 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  FirebaseAuthServices firebaseAuthServices = FirebaseAuthServices();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+
+  Future<void> signInWithEmailAndPassword() async {
+    try {
+      final UserCredential userCredential =
+          await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+    } catch (e) {
+      print(e);
+      SnackBar(
+        content: Text('Login failed!: $e'),
+      );
+      // Handle errors such as invalid email/password, user not found, etc.
+      // Example: Show a snackbar or alert dialog with an error message
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,8 +86,9 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             child: TextFormField(
+                              controller: _emailController,
                               decoration: InputDecoration(
-                                hintText: 'Username or Email',
+                                hintText: 'Email',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 fillColor: Colors.black.withOpacity(0.1),
                                 filled: true,
@@ -86,6 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             child: TextFormField(
+                              controller: _passwordController,
                               obscureText: true,
                               decoration: InputDecoration(
                                 hintText: 'Password',
@@ -107,7 +134,13 @@ class _LoginPageState extends State<LoginPage> {
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ForgotPassword()));
+                              },
                               child: Text(
                                 'Forgot Password?',
                                 style: TextStyle(
@@ -121,7 +154,9 @@ class _LoginPageState extends State<LoginPage> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                signInWithEmailAndPassword();
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue, // Button color
                                 padding: EdgeInsets.symmetric(vertical: 15),
@@ -150,9 +185,12 @@ class _LoginPageState extends State<LoginPage> {
                                 height: 60,
                                 width: 60,
                                 child: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    firebaseAuthServices
+                                        .signInWithGoogle(context);
+                                  },
                                   icon: Image.asset(
-                                      'assets/google_icon.png'), // Add your Google icon image path
+                                      'assets/google.png'), // Add your Google icon image path
                                   iconSize: 50,
                                 ),
                               ),
@@ -161,34 +199,37 @@ class _LoginPageState extends State<LoginPage> {
                                 height: 60,
                                 width: 60,
                                 child: IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    firebaseAuthServices
+                                        .signInWithFacebook(context);
+                                  },
                                   icon: Image.asset(
                                       'assets/facebook_icon.png'), // Add your Facebook icon image path
                                   iconSize: 40,
                                 ),
                               ),
-                              SizedBox(width: 15),
-                              SizedBox(
-                                height: 60,
-                                width: 60,
-                                child: IconButton(
-                                  onPressed: () {},
-                                  icon: Image.asset(
-                                      'assets/apple_icon.png'), // Add your Apple icon image path
-                                  iconSize: 40,
-                                ),
-                              ),
-                              SizedBox(width: 15),
-                              SizedBox(
-                                height: 60,
-                                width: 60,
-                                child: IconButton(
-                                  onPressed: () {},
-                                  icon: Image.asset(
-                                      'assets/twitter_icon.png'), // Add your Twitter icon image path
-                                  iconSize: 40,
-                                ),
-                              ),
+                              // SizedBox(width: 15),
+                              // SizedBox(
+                              //   height: 60,
+                              //   width: 60,
+                              //   child: IconButton(
+                              //     onPressed: () {},
+                              //     icon: Image.asset(
+                              //         'assets/apple_icon.png'), // Add your Apple icon image path
+                              //     iconSize: 40,
+                              //   ),
+                              // ),
+                              // SizedBox(width: 15),
+                              // SizedBox(
+                              //   height: 60,
+                              //   width: 60,
+                              //   child: IconButton(
+                              //     onPressed: () {},
+                              //     icon: Image.asset(
+                              //         'assets/twitter_icon.png'), // Add your Twitter icon image path
+                              //     iconSize: 40,
+                              //   ),
+                              // ),
                             ],
                           ),
                           SizedBox(height: 20),
@@ -217,6 +258,9 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
+                          SizedBox(
+                            height: 40,
+                          )
                         ],
                       ),
                     ),

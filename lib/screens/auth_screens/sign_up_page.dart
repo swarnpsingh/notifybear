@@ -43,7 +43,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           Expanded(
                             child: Image.asset(
                               'assets/notifybear.com.png', // Add your logo image path here
-                              height: 10,
+                              height: 5,
                               width: 400,
                               //fit: BoxFit.contain,
                             ),
@@ -141,7 +141,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 30),
 
                           SizedBox(
                             width: double.infinity,
@@ -166,66 +166,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                           SizedBox(height: 30),
                           // Social Media Login Options
-                          Text(
-                            'Signup Using',
-                            style: TextStyle(color: Colors.grey, fontSize: 14),
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 60,
-                                width: 60,
-                                child: IconButton(
-                                  onPressed: () {
-                                    firebaseAuthServices
-                                        .signInWithGoogle(context);
-                                  },
-                                  icon: Image.asset(
-                                      'assets/google_icon.png'), // Add your Google icon image path
-                                  iconSize: 50,
-                                ),
-                              ),
-                              SizedBox(width: 15),
-                              SizedBox(
-                                height: 60,
-                                width: 60,
-                                child: IconButton(
-                                  onPressed: () {
-                                    firebaseAuthServices
-                                        .signUpWithFacebook(context);
-                                  },
-                                  icon: Image.asset(
-                                      'assets/facebook_icon.png'), // Add your Facebook icon image path
-                                  iconSize: 40,
-                                ),
-                              ),
-                              SizedBox(width: 15),
-                              SizedBox(
-                                height: 60,
-                                width: 60,
-                                child: IconButton(
-                                  onPressed: () {},
-                                  icon: Image.asset(
-                                      'assets/apple_icon.png'), // Add your Apple icon image path
-                                  iconSize: 40,
-                                ),
-                              ),
-                              SizedBox(width: 15),
-                              SizedBox(
-                                height: 60,
-                                width: 60,
-                                child: IconButton(
-                                  onPressed: () {},
-                                  icon: Image.asset(
-                                      'assets/twitter_icon.png'), // Add your Twitter icon image path
-                                  iconSize: 40,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 20),
+
                           // Sign Up Option
                           GestureDetector(
                             onTap: () {
@@ -251,6 +192,9 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                             ),
                           ),
+                          SizedBox(
+                            height: 40,
+                          )
                         ],
                       ),
                     ),

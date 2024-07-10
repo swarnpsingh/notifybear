@@ -3,12 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:twitter_login/twitter_login.dart';
 
 class FirebaseAuthServices {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-
   Future<void> signUp(
       _emailController, _passwordController, _usernameController) async {
     try {
@@ -70,7 +70,7 @@ class FirebaseAuthServices {
     }
   }
 
-  Future<void> signUpWithFacebook(BuildContext context) async {
+  Future<void> signInWithFacebook(BuildContext context) async {
     try {
       // Trigger the sign-in flow
       final LoginResult loginResult = await FacebookAuth.instance.login();
@@ -102,6 +102,65 @@ class FirebaseAuthServices {
       // Handle other errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred. Please try again.')),
+      );
+    }
+  }
+
+  Future<void> signInWithTwitter() async {
+    // Create a TwitterLogin instance
+    final twitterLogin = TwitterLogin(
+      apiKey: 'UUWTBIJwVGKAazTUgmx2HadNZ',
+      apiSecretKey: 'sS02dU9JvNOAmaemWLkgx1gqmjie91KWf8uoi2ur9ZMOsRYccJ',
+      redirectURI: 'https://notifybear-5195a.firebaseapp.com/__/auth/handler',
+    );
+
+    // Trigger the sign-in flow
+    final authResult = await twitterLogin.login();
+
+    // Now you can switch on the status
+    switch (authResult.status) {
+      case TwitterLoginStatus.loggedIn:
+        // success
+        print('Logged in! Username: ${authResult.user?.name}');
+        break;
+      case TwitterLoginStatus.cancelledByUser:
+        // cancel
+        print('Login cancelled by user.');
+        break;
+      case TwitterLoginStatus.error:
+        // error
+        print('Login error: ${authResult.errorMessage}');
+        break;
+      case TwitterLoginStatus.cancelledByUser:
+        // cancel
+        print('Login cancelled by user.');
+        break;
+      case null:
+        print('null');
+    }
+  }
+
+  void sendPasswordResetEmail(BuildContext context, emailController) async {
+    String email = emailController.text.trim();
+
+    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid email format')),
+      );
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Password reset email sent')),
+      );
+    } catch (e) {
+      print('Failed to send password reset email: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content:
+                Text('Failed to send password reset email: ${e.toString()}')),
       );
     }
   }

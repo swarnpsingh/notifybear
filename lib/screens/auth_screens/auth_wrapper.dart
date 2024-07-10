@@ -1,35 +1,25 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:notifybear/screens/auth_screens/entry_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:notifybear/screens/auth_screens/login_page.dart';
 
-class AuthWrapper extends StatefulWidget {
-  @override
-  _AuthWrapperState createState() => _AuthWrapperState();
-}
-
-class _AuthWrapperState extends State<AuthWrapper> {
-  bool _isAuthenticated = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAuthStatus();
-  }
-
-  Future<void> _checkAuthStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('userToken');
-    setState(() {
-      _isAuthenticated = token != null;
-    });
-  }
-
+class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    if (_isAuthenticated) {
-      return Scaffold();
-    } else {
-      return EntryScreen();
-    }
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Show a loading spinner
+          return CircularProgressIndicator();
+        }
+        if (snapshot.hasData) {
+          // User is logged in, navigate to HomePage
+          return Scaffold();
+        } else {
+          // User is not logged in, navigate to LoginPage
+          return LoginPage();
+        }
+      },
+    );
   }
 }
