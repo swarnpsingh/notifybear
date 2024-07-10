@@ -15,56 +15,71 @@ class _EntryScreenState extends State<EntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: MyColors.getBackgroundGradient(),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/icon-mascot.png',
-                  height: 200,
-                ),
-                SizedBox(height: 10),
-                GradientText('notifybear',
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight,
+              ),
+              child: IntrinsicHeight(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: MyColors.getBackgroundGradient(),
+                  ),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 40),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/icon-mascot.png',
+                            height: 200,
+                          ),
+                          SizedBox(height: 10),
+                          GradientText('notifybear',
+                              style: TextStyle(
+                                fontSize: 34,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              gradient: MyColors.getTextGradient()),
+                          SizedBox(height: 10),
+                          Text(
+                            'Stay on top of your favorite creators\' updates.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 19,
+                            ),
+                          ),
+                          SizedBox(height: 50),
+                          OutlineButton(
+                              text: 'LOGIN',
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginPage()));
+                              }),
+                          SizedBox(height: 25),
+                          OutlineButton(
+                              text: 'SIGN UP',
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SignUpPage()));
+                              })
+                        ],
+                      ),
                     ),
-                    gradient: MyColors.getTextGradient()),
-                SizedBox(height: 10),
-                Text(
-                  'Stay on top of your favorite creators\' updates.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 19,
                   ),
                 ),
-                SizedBox(height: 50),
-                OutlineButton(
-                    text: 'LOGIN',
-                    onPressed: () {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => LoginPage()));
-                    }),
-                SizedBox(height: 25),
-                OutlineButton(
-                    text: 'SIGN UP',
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SignUpPage()));
-                    })
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
