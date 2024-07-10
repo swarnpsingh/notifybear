@@ -59,10 +59,31 @@ class FirebaseAuthServices {
         idToken: googleAuth.idToken,
       );
 
-      await _auth.signInWithCredential(credential);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign in successful!')),
-      );
+      // Sign in to Firebase Authentication
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+
+      // Get the user information
+      final User? user = userCredential.user;
+      final String? displayName = user?.displayName;
+      final String? email = user?.email;
+
+      // Store user info in Firestore
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'username': displayName,
+          'email': email,
+          // You can add more fields as needed
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign in successful!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('User information not found')),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign in failed: $e')),
