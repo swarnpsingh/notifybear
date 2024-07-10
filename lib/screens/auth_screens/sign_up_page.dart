@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notifybear/screens/add_platforms.dart';
 import 'package:notifybear/screens/auth_screens/login_page.dart';
 import 'package:notifybear/services/firebase_auth_services.dart';
 
@@ -149,6 +150,10 @@ class _SignUpPageState extends State<SignUpPage> {
                               onPressed: () {
                                 firebaseAuthServices.signUp(_emailController,
                                     _passwordController, _usernameController);
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddPlatforms()));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue, // Button color
