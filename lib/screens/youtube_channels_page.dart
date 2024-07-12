@@ -30,11 +30,20 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
   Future<void> _loadChannels() async {
     setState(() => isLoading = true);
     try {
-      final loadedChannels = await _youTubeApiService.getSubscribedChannels();
-      setState(() {
-        channels = loadedChannels;
-        isLoading = false;
-      });
+      if (selectedPlatform == 'YouTube') {
+        final loadedChannels = await _youTubeApiService.getSubscribedChannels();
+        setState(() {
+          channels = loadedChannels;
+          filteredChannels = loadedChannels; //isme dikkat aa sakti hai
+          isLoading = false;
+        });
+      } else if (selectedPlatform == 'Instagram') {
+        setState(() {
+          channels = [];
+          filteredChannels = channels;
+          isLoading = false;
+        });
+      }
     } catch (e) {
       print('Error loading channels: $e');
       setState(() {
@@ -52,6 +61,13 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
         final channelName = channel.name.toLowerCase();
         return channelName.contains(query);
       }).toList();
+    });
+  }
+
+  void _onPlatformSelected(String platform) {
+    setState(() {
+      selectedPlatform = platform;
+      _loadChannels();
     });
   }
 
@@ -97,11 +113,25 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
               style: TextStyle(color: Colors.white),
             ),
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildPlatformButton('YouTube', 'assets/youtube.png'),
+              _buildPlatformButton('Instagram', 'assets/instagram.png'),
+            ],
+          ),
+          SizedBox(
+            height: 10,
+          ),
           Expanded(
             child: isLoading
                 ? Center(child: CircularProgressIndicator())
                 : filteredChannels.isEmpty
-                    ? Center(child: Text('No subscribed channels found'))
+                    ? Center(
+                        child: Text(
+                        'No subscribed channels found',
+                        style: TextStyle(color: Colors.white),
+                      ))
                     : ListView.builder(
                         itemCount: filteredChannels.length,
                         itemBuilder: (context, index) {
@@ -110,6 +140,42 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
                       ),
           ),
         ]),
+      ),
+    );
+  }
+
+  Widget _buildPlatformButton(String platform, String iconPath) {
+    return GestureDetector(
+      onTap: () => _onPlatformSelected(platform),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        margin: EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: selectedPlatform == platform
+              ? Colors.blue
+              : Color.fromRGBO(16, 19, 28, 1),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Image.asset(
+              iconPath,
+              height: 22,
+              width: 22,
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Text(
+              platform,
+              style: TextStyle(
+                color:
+                    selectedPlatform == platform ? Colors.black : Colors.white,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
