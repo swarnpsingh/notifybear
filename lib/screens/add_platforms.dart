@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notifybear/models/social_platform.dart';
-import 'package:notifybear/screens/welcome_screen.dart';
+import 'package:notifybear/screens/youtube_channels_page.dart';
 
 import '../shared/my_colors.dart';
 
@@ -154,7 +154,7 @@ class _AddPlatformsState extends State<AddPlatforms> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => WelcomeScreen()));
+                              builder: (context) => YouTubeChannelsPage()));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
