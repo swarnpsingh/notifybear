@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notifybear/models/social_platform.dart';
 import 'package:notifybear/screens/youtube_channels_page.dart';
+import 'package:notifybear/services/twitch_api_service.dart';
 
 import '../shared/my_colors.dart';
 
@@ -13,6 +14,7 @@ class AddPlatforms extends StatefulWidget {
 
 class _AddPlatformsState extends State<AddPlatforms> {
   List<SocialPlatform> displayedPlatforms = [];
+  TwitchApiService twitchApiService = TwitchApiService();
   TextEditingController searchController = TextEditingController();
   static List<SocialPlatform> platforms = [
     SocialPlatform(name: 'YouTube', iconPath: 'assets/youtube.png'),
