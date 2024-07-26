@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
+import 'package:notifybear/screens/add_platforms.dart';
 import 'package:twitter_login/twitter_login.dart';
 
 class FirebaseAuthServices {
@@ -47,7 +49,9 @@ class FirebaseAuthServices {
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAccount? googleUser = await GoogleSignIn(
+        scopes: ['https://www.googleapis.com/auth/youtube.readonly'],
+      ).signIn();
       if (googleUser == null) {
         return; // The user canceled the sign-in
       }
@@ -59,10 +63,50 @@ class FirebaseAuthServices {
         idToken: googleAuth.idToken,
       );
 
-      await _auth.signInWithCredential(credential);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign in successful!')),
-      );
+      // Sign in to Firebase Authentication
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        // Request a token with the YouTube scope
+        final String? token = await user.getIdToken(true);
+
+        if (token != null) {
+          // Use this token to make YouTube API requests
+          final response = await http.get(
+            Uri.parse(
+                'https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50'),
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+          );
+
+          if (response.statusCode == 200) {
+            // Successfully fetched YouTube data
+            print('YouTube data: ${response.body}');
+          } else {
+            print('Failed to fetch YouTube data: ${response.statusCode}');
+          }
+        }
+
+        // Store user info in Firestore (as you were doing before)
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'username': user.displayName,
+          'email': user.email,
+          // You can add more fields as needed
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign in successful!')),
+        );
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => AddPlatforms()));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('User information not found')),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Sign in failed: $e')),

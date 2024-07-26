@@ -31,7 +31,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with "example://gizmos” -->
                 <!-- Registered Callback URLs in TwitterApp -->
-                <data android:scheme="https://notifybear-5195a.firebaseapp.com/__/auth/handler"
+                <data android:scheme="myapp" android:host= "auth"
                      /> <!-- host is option -->
             </intent-filter>
         </activity>

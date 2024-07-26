@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:notifybear/screens/add_platforms.dart';
 import 'package:notifybear/screens/auth_screens/forgot_password.dart';
 import 'package:notifybear/screens/auth_screens/sign_up_page.dart';
 import 'package:notifybear/services/firebase_auth_services.dart';
@@ -156,6 +157,10 @@ class _LoginPageState extends State<LoginPage> {
                             child: ElevatedButton(
                               onPressed: () {
                                 signInWithEmailAndPassword();
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddPlatforms()));
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue, // Button color
