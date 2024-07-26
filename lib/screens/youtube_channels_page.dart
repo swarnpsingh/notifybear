@@ -1,17 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:notifybear/models/linkedin_account.dart';
 import 'package:notifybear/screens/welcome_screen.dart';
-import 'package:notifybear/services/linkedin_api_service.dart';
-import 'package:notifybear/services/twitch_api_service.dart';
-import 'package:notifybear/services/twitch_auth.dart';
-import 'package:notifybear/services/youtube_api_service.dart';
-import 'package:notifybear/widgets/twitch_channel_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/channel.dart';
 import '../models/channel_tile.dart';
+import '../models/linkedin_account.dart';
 import '../models/twitch_followed_channel.dart';
 import '../services/instagram_api_service.dart';
+import '../services/linkedin_api_service.dart';
+import '../services/twitch_api_service.dart';
+import '../services/twitch_auth.dart';
+import '../services/youtube_api_service.dart';
 import '../shared/my_colors.dart';
+import '../widgets/twitch_channel_tile.dart';
 
 class YouTubeChannelsPage extends StatefulWidget {
   @override
@@ -21,6 +23,7 @@ class YouTubeChannelsPage extends StatefulWidget {
 class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
   List channels = [];
   List filteredChannels = [];
+  List<Channel> selectedChannels = [];
   bool isLoading = true;
   bool isAuthenticated = false;
   TextEditingController _searchController = TextEditingController();
@@ -39,6 +42,37 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
     //_linkedInApiService.authenticate();
     _authenticateWithLinkedIn();
     _authenticateWithTwitch();
+    _loadSelectedChannels();
+  }
+
+  Future<void> _loadSelectedChannels() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+
+      final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        final channelData = userDoc['selectedChannels'] as List<dynamic>;
+        final List<Channel> loadedChannels =
+            channelData.map((data) => Channel.fromMap(data)).toList();
+
+        setState(() {
+          selectedChannels = loadedChannels;
+        });
+      }
+    } catch (e) {
+      print('Error loading selected channels: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading selected channels: $e')));
+    }
+
+    _authenticateWithLinkedIn();
+    _authenticateWithTwitch();
+    _loadChannels();
   }
 
   Future<void> _authenticateWithLinkedIn() async {
@@ -153,6 +187,40 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
     _loadChannels();
   }
 
+  void _toggleChannelSelection(Channel channel) {
+    setState(() {
+      if (selectedChannels.contains(channel)) {
+        selectedChannels.remove(channel);
+      } else {
+        selectedChannels.add(channel);
+      }
+    });
+  }
+
+  Future<void> _saveSelectedChannels() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString(
+          'user_id'); // Assume user ID is stored in SharedPreferences
+
+      final List<Map<String, dynamic>> channelData =
+          selectedChannels.map((channel) => channel.toMap()).toList();
+
+      await FirebaseFirestore.instance.collection('users').doc(userId).update({
+        'selectedChannels': channelData,
+      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => WelcomeScreen()),
+      );
+    } catch (e) {
+      print('Error saving selected channels: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error saving selected channels: $e')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,9 +232,9 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
           const SizedBox(
             height: 30,
           ),
-          Padding(
+          const Padding(
             padding: EdgeInsets.all(16),
-            child: const Align(
+            child: Align(
               alignment: Alignment.centerLeft,
               child: SizedBox(
                 height: 50,
@@ -178,7 +246,7 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
             ),
           ),
           Container(
-            padding: EdgeInsets.all(18),
+            padding: const EdgeInsets.all(18),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -228,12 +296,19 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
                           if (selectedPlatform == 'YouTube' ||
                               selectedPlatform == 'Instagram') {
                             // Assuming 'ChannelTile' is used for both YouTube and Instagram channels
-                            return ChannelTile(channel: channel);
+                            return ChannelTile(
+                              channel: channel,
+                              onAdd: () => _toggleChannelSelection(channel),
+                              platform: 'youtube',
+                            );
                           } else if (selectedPlatform == 'Twitch' &&
                               channel is TwitchFollowedChannel) {
                             // Ensure to check if the channel is of type TwitchFollowedChannel
                             return TwitchChannelTile(
-                                twitchFollowedChannel: channel);
+                              twitchFollowedChannel: channel,
+                              onAdd: () {},
+                              platform: 'twitch',
+                            );
                           } else if (selectedPlatform == 'LinkedIn' &&
                               channel is LinkedInAccount) {
                             // Adjust this for LinkedIn channel display
@@ -256,10 +331,7 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
             height: 60,
             width: 200,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => WelcomeScreen()));
-              },
+              onPressed: _saveSelectedChannels,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 shape: RoundedRectangleBorder(

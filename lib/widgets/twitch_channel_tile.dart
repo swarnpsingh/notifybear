@@ -3,8 +3,13 @@ import 'package:notifybear/models/twitch_followed_channel.dart';
 
 class TwitchChannelTile extends StatelessWidget {
   final TwitchFollowedChannel twitchFollowedChannel;
+  final VoidCallback onAdd;
+  final String platform;
 
-  TwitchChannelTile({required this.twitchFollowedChannel});
+  TwitchChannelTile(
+      {required this.twitchFollowedChannel,
+      required this.onAdd,
+      required this.platform});
 
   @override
   Widget build(BuildContext context) {
@@ -37,14 +42,11 @@ class TwitchChannelTile extends StatelessWidget {
               decoration: BoxDecoration(
                   color: Colors.blue, borderRadius: BorderRadius.circular(10)),
               child: IconButton(
-                icon: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  // Implement adding the channel to your app
-                },
-              ))
+                  icon: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                  onPressed: onAdd))
         ],
       ),
     );

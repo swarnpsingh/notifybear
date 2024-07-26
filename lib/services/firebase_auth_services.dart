@@ -5,12 +5,26 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:notifybear/screens/add_platforms.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twitter_login/twitter_login.dart';
 
 class FirebaseAuthServices {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  // Method to save user ID in SharedPreferences
+  Future<void> _saveUserId(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_id', userId);
+  }
+
+// Method to get user ID from SharedPreferences
+  Future<String?> _getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
+
   Future<void> signUp(
       _emailController, _passwordController, _usernameController) async {
     try {
@@ -26,6 +40,9 @@ class FirebaseAuthServices {
         'UserName': _usernameController.text,
         'email': _emailController.text,
       });
+
+      // Save user ID in SharedPreferences
+      await _saveUserId(userCredential.user!.uid);
 
       // User signed up successfully
       print("Signed up: ${userCredential.user!.uid}");
@@ -69,6 +86,9 @@ class FirebaseAuthServices {
       final User? user = userCredential.user;
 
       if (user != null) {
+        // Save user ID in SharedPreferences
+        await _saveUserId(user.uid);
+
         // Request a token with the YouTube scope
         final String? token = await user.getIdToken(true);
 
@@ -128,6 +148,9 @@ class FirebaseAuthServices {
         // Once signed in, return the UserCredential
         UserCredential userCredential = await FirebaseAuth.instance
             .signInWithCredential(facebookAuthCredential);
+
+        // Save user ID in SharedPreferences
+        await _saveUserId(userCredential.user!.uid);
 
         // You can access the new user via userCredential.user
         print("Signed up: ${userCredential.user!.displayName}");
