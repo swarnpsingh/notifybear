@@ -20,4 +20,21 @@ class TwitchFollowedChannel {
           json['profile_image_url'], // Assuming profile image URL field name
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'login': login,
+      'name': name,
+      'imageUrl': imageUrl,
+    };
+  }
+
+  factory TwitchFollowedChannel.fromMap(Map<String, dynamic> map) {
+    return TwitchFollowedChannel(
+        name: map['name'],
+        imageUrl: map['imageUrl'],
+        id: map['id'],
+        login: map['login']);
+  }
 }

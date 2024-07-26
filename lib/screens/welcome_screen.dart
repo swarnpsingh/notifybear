@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../shared/my_colors.dart';
 import '../shared/my_styles.dart';
+import 'home_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -49,7 +50,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   const SizedBox(height: 80),
                   ElevatedButton(
                     onPressed: () {
-                      // Add your button action here
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomeScreen(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
