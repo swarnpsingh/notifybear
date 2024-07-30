@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notifybear/screens/youtube_channels_page.dart';
+import 'package:notifybear/widgets/custom_drawer.dart';
 import 'package:notifybear/widgets/latest_video_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -10,7 +11,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/channel.dart';
 import '../services/youtube_api_service.dart';
 import '../shared/my_colors.dart';
-import '../shared/my_styles.dart';
 import '../widgets/side_menu_panel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -164,142 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        backgroundColor: Colors.black,
-        child: ListView(
-          padding: EdgeInsets.all(5),
-          children: <Widget>[
-            SizedBox(
-              height: 75,
-            ),
-            ListTile(
-              title: Text('Home',
-                  style: TextStyle(
-                      color: _selectedDrawerIndex == 0
-                          ? Colors.blue
-                          : Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedDrawerIndex = 0;
-                });
-                // Handle the navigation
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text(
-                'Your Creators',
-                style: TextStyle(
-                    color:
-                        _selectedDrawerIndex == 1 ? Colors.blue : Colors.white),
-              ),
-              onTap: () {
-                setState(() {
-                  _selectedDrawerIndex = 1;
-                });
-                // Handle the navigation
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Scaffold()));
-              },
-            ),
-            ListTile(
-              title: Text('Add/Remove a Creator',
-                  style: TextStyle(
-                      color: _selectedDrawerIndex == 2
-                          ? Colors.blue
-                          : Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedDrawerIndex = 2;
-                });
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Scaffold()));
-                // Handle the navigation
-              },
-            ),
-            ListTile(
-              title: Text('Bear Shop',
-                  style: TextStyle(
-                      color: _selectedDrawerIndex == 3
-                          ? Colors.blue
-                          : Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedDrawerIndex = 3;
-                });
-                // Handle the navigation
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Scaffold()));
-              },
-            ),
-            ListTile(
-              title: Text('Settings',
-                  style: TextStyle(
-                      color: _selectedDrawerIndex == 4
-                          ? Colors.blue
-                          : Colors.white)),
-              onTap: () {
-                setState(() {
-                  _selectedDrawerIndex = 4;
-                });
-                // Handle the navigation
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Scaffold()));
-              },
-            ),
-            SizedBox(
-              height: 230,
-            ),
-            ListTile(
-              leading: Image.asset('assets/Crown.png'),
-              title: GradientText(
-                'Bear Premium',
-                style: TextStyle(fontWeight: FontWeight.bold),
-                gradient: MyColors.getTextGradient(),
-              ),
-              onTap: () {
-                // Handle the navigation
-                Navigator.pop(context);
-              },
-            ),
-            SwitchListTile(
-              title: Text(
-                'Dark mode On',
-                style: TextStyle(color: Colors.white),
-              ),
-              value: true,
-              onChanged: (bool value) {
-                // Handle dark mode switch
-              },
-              activeColor: Colors.black,
-              inactiveThumbColor: Colors.grey,
-              activeTrackColor: Colors.white,
-            ),
-            ListTile(
-              leading: Icon(Icons.logout, color: Colors.white),
-              title: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () {
-                // Handle logout
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.switch_account, color: Colors.white),
-              title: Text(
-                'Switch Account',
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () {
-                // Handle account switching
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: CustomDrawer(),
       body: SlidingUpPanel(
         controller: _panelController,
         panel: sideMenuPanel(),

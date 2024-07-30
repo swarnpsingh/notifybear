@@ -52,6 +52,7 @@ dependencies:
   html_unescape: ^2.0.0
   sliding_up_panel: ^2.0.0+1
   fluentui_system_icons: ^1.1.251
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
