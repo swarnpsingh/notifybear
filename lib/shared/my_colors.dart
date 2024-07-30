@@ -31,4 +31,5 @@ class MyColors {
 
   static const Color primaryColor = Color.fromRGBO(0, 123, 255, 1);
   static const Color secondaryColor = Color.fromRGBO(255, 182, 193, 1);
+  static const Color backgroundColor = Color.fromRGBO(1, 1, 3, 1);
 }
