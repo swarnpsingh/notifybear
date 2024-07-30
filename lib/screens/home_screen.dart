@@ -4,11 +4,14 @@ import 'package:intl/intl.dart';
 import 'package:notifybear/screens/youtube_channels_page.dart';
 import 'package:notifybear/widgets/latest_video_tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/channel.dart';
 import '../services/youtube_api_service.dart';
 import '../shared/my_colors.dart';
+import '../shared/my_styles.dart';
+import '../widgets/side_menu_panel.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -20,6 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Channel> selectedChannels = [];
   List<Map<String, dynamic>> latestVideos = [];
   bool isLoading = true;
+  int _selectedDrawerIndex = 0;
+  final PanelController _panelController = PanelController();
 
   @override
   void initState() {
@@ -159,142 +164,302 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: MyColors.getBackgroundGradient(),
+      drawer: Drawer(
+        backgroundColor: Colors.black,
+        child: ListView(
+          padding: EdgeInsets.all(5),
+          children: <Widget>[
+            SizedBox(
+              height: 75,
+            ),
+            ListTile(
+              title: Text('Home',
+                  style: TextStyle(
+                      color: _selectedDrawerIndex == 0
+                          ? Colors.blue
+                          : Colors.white)),
+              onTap: () {
+                setState(() {
+                  _selectedDrawerIndex = 0;
+                });
+                // Handle the navigation
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text(
+                'Your Creators',
+                style: TextStyle(
+                    color:
+                        _selectedDrawerIndex == 1 ? Colors.blue : Colors.white),
+              ),
+              onTap: () {
+                setState(() {
+                  _selectedDrawerIndex = 1;
+                });
+                // Handle the navigation
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Scaffold()));
+              },
+            ),
+            ListTile(
+              title: Text('Add/Remove a Creator',
+                  style: TextStyle(
+                      color: _selectedDrawerIndex == 2
+                          ? Colors.blue
+                          : Colors.white)),
+              onTap: () {
+                setState(() {
+                  _selectedDrawerIndex = 2;
+                });
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Scaffold()));
+                // Handle the navigation
+              },
+            ),
+            ListTile(
+              title: Text('Bear Shop',
+                  style: TextStyle(
+                      color: _selectedDrawerIndex == 3
+                          ? Colors.blue
+                          : Colors.white)),
+              onTap: () {
+                setState(() {
+                  _selectedDrawerIndex = 3;
+                });
+                // Handle the navigation
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Scaffold()));
+              },
+            ),
+            ListTile(
+              title: Text('Settings',
+                  style: TextStyle(
+                      color: _selectedDrawerIndex == 4
+                          ? Colors.blue
+                          : Colors.white)),
+              onTap: () {
+                setState(() {
+                  _selectedDrawerIndex = 4;
+                });
+                // Handle the navigation
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Scaffold()));
+              },
+            ),
+            SizedBox(
+              height: 230,
+            ),
+            ListTile(
+              leading: Image.asset('assets/Crown.png'),
+              title: GradientText(
+                'Bear Premium',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                gradient: MyColors.getTextGradient(),
+              ),
+              onTap: () {
+                // Handle the navigation
+                Navigator.pop(context);
+              },
+            ),
+            SwitchListTile(
+              title: Text(
+                'Dark mode On',
+                style: TextStyle(color: Colors.white),
+              ),
+              value: true,
+              onChanged: (bool value) {
+                // Handle dark mode switch
+              },
+              activeColor: Colors.black,
+              inactiveThumbColor: Colors.grey,
+              activeTrackColor: Colors.white,
+            ),
+            ListTile(
+              leading: Icon(Icons.logout, color: Colors.white),
+              title: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.white),
+              ),
+              onTap: () {
+                // Handle logout
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.switch_account, color: Colors.white),
+              title: Text(
+                'Switch Account',
+                style: TextStyle(color: Colors.white),
+              ),
+              onTap: () {
+                // Handle account switching
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
-        child: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 30),
-                  Row(
-                    children: [
-                      IconButton(
+      ),
+      body: SlidingUpPanel(
+        controller: _panelController,
+        panel: sideMenuPanel(),
+        body: _buildMainContent(),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24.0),
+          bottomLeft: Radius.circular(24.0),
+        ),
+        defaultPanelState: PanelState.CLOSED,
+        maxHeight:
+            MediaQuery.of(context).size.width * 0.5, // Adjust width as needed
+        minHeight: 0,
+        parallaxEnabled: true,
+        parallaxOffset: 0.5,
+        backdropEnabled: true,
+        backdropOpacity: 0.5,
+        slideDirection: SlideDirection.UP, // Slide from right
+      ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: MyColors.getBackgroundGradient(),
+      ),
+      child: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 30),
+                Row(
+                  children: [
+                    Builder(builder: (context) {
+                      return IconButton(
                         icon: Icon(
                           Icons.menu,
                           color: Colors.white,
                         ),
                         iconSize: 35,
                         onPressed: () {
-                          // Implement menu button functionality
+                          Scaffold.of(context).openDrawer();
                         },
-                      ),
-                      Spacer(),
-                      IconButton(
-                        icon: Icon(Icons.shopping_cart, color: Colors.white),
-                        iconSize: 35,
-                        onPressed: () {
-                          // Implement cart button functionality
-                        },
-                      ),
-                    ],
-                  ),
-                  Container(
-                    height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: selectedChannels.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return GestureDetector(
-                            onTap: () {
-                              // Navigate to the add channel page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        YouTubeChannelsPage()),
-                              );
-                            },
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: CircleAvatar(
-                                radius: 35,
-                                backgroundColor: Colors.black,
-                                child: Icon(
-                                  Icons.add,
-                                  size: 40,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          );
-                        } else {
-                          final channel = selectedChannels[index - 1];
-                          return Padding(
+                      );
+                    }),
+                    Spacer(),
+                    IconButton(
+                      icon: Icon(Icons.shopping_cart, color: Colors.white),
+                      iconSize: 35,
+                      onPressed: () {
+                        // Implement cart button functionality
+                      },
+                    ),
+                  ],
+                ),
+                Container(
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: selectedChannels.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return GestureDetector(
+                          onTap: () {
+                            // Navigate to the add channel page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => YouTubeChannelsPage()),
+                            );
+                          },
+                          child: Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: CircleAvatar(
-                              radius: 33,
-                              backgroundImage: NetworkImage(channel.imageUrl),
+                              radius: 35,
+                              backgroundColor: Colors.black,
+                              child: Icon(
+                                Icons.add,
+                                size: 40,
+                                color: Colors.white,
+                              ),
                             ),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                  Divider(
-                    color: Colors.white,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Your Notifications',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Spacer(),
-                        Text('All',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 21)),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        InkWell(
-                            onTap: () {},
-                            child: Icon(
-                              Icons.expand_more_sharp,
-                              color: Colors.white,
-                              size: 40,
-                            ))
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: latestVideos.length,
-                      itemBuilder: (context, index) {
-                        final video = latestVideos[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 8.0),
-                          child: GestureDetector(
-                              onTap: () => _handleVideoClick(
-                                  video['id'] ?? '', video['videoUrl'] ?? ''),
-                              child: latestVideoTile(
-                                video['thumbnailUrl'] ?? '',
-                                video['title'] ?? '',
-                                Image.asset('assets/youtube.png'),
-                                video['channelProfilePic'] ?? '',
-                                Text(
-                                  '${video['channelName']} • ${video['clicks']} Clicks • ${_formatPublishedAt(video['publishedAt'] ?? '')}',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              )),
+                          ),
                         );
-                      },
-                    ),
+                      } else {
+                        final channel = selectedChannels[index - 1];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: CircleAvatar(
+                            radius: 33,
+                            backgroundImage: NetworkImage(channel.imageUrl),
+                          ),
+                        );
+                      }
+                    },
                   ),
-                ],
-              ),
-      ),
+                ),
+                Divider(
+                  color: Colors.white,
+                ),
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Your Notifications',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Spacer(),
+                      Text('All',
+                          style: TextStyle(color: Colors.white, fontSize: 21)),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      InkWell(
+                          onTap: () {
+                            _panelController.isPanelOpen
+                                ? _panelController.close()
+                                : _panelController.open();
+                          },
+                          child: Icon(
+                            Icons.expand_more_sharp,
+                            color: Colors.white,
+                            size: 40,
+                          ))
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: latestVideos.length,
+                    itemBuilder: (context, index) {
+                      final video = latestVideos[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 8.0),
+                        child: GestureDetector(
+                            onTap: () => _handleVideoClick(
+                                video['id'] ?? '', video['videoUrl'] ?? ''),
+                            child: latestVideoTile(
+                              video['thumbnailUrl'] ?? '',
+                              video['title'] ?? '',
+                              Image.asset('assets/youtube.png'),
+                              video['channelProfilePic'] ?? '',
+                              Text(
+                                '${video['channelName']} • ${video['clicks']} Clicks • ${_formatPublishedAt(video['publishedAt'] ?? '')}',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:notifybear/main_screen.dart';
 
 import '../shared/my_colors.dart';
 import '../shared/my_styles.dart';
-import 'home_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -53,7 +53,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomeScreen(),
+                          builder: (context) =>
+                              MainScreen(), // yahan pe bt hogi
                         ),
                       );
                     },
