@@ -2,7 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:notifybear/screens/bear_shop.dart';
 import 'package:notifybear/screens/home_screen.dart';
-import 'package:notifybear/screens/profile_page.dart';
+import 'package:notifybear/screens/profile/profile_page.dart';
 import 'package:notifybear/screens/saved_notifications.dart';
 import 'package:notifybear/screens/search_screen.dart';
 import 'package:notifybear/shared/my_colors.dart';
