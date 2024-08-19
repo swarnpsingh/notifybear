@@ -23,7 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Channel> selectedChannels = [];
   List<Map<String, dynamic>> latestVideos = [];
   bool isLoading = true;
-  int _selectedDrawerIndex = 0;
   final PanelController _panelController = PanelController();
 
   @override
@@ -169,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
         controller: _panelController,
         panel: sideMenuPanel(),
         body: _buildMainContent(),
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24.0),
           bottomLeft: Radius.circular(24.0),
         ),
@@ -211,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       );
                     }),
-                    Spacer(),
+                    const Spacer(),
                     IconButton(
                       icon: Icon(Icons.shopping_cart, color: Colors.white),
                       iconSize: 35,
@@ -237,9 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   builder: (context) => YouTubeChannelsPage()),
                             );
                           },
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
                             child: CircleAvatar(
                               radius: 35,
                               backgroundColor: Colors.black,
@@ -264,24 +262,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ),
-                Divider(
+                const Divider(
                   color: Colors.white,
                 ),
                 Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Row(
                     children: [
-                      Text(
+                      const Text(
                         'Your Notifications',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 22,
                             fontWeight: FontWeight.bold),
                       ),
-                      Spacer(),
-                      Text('All',
+                      const Spacer(),
+                      const Text('All',
                           style: TextStyle(color: Colors.white, fontSize: 21)),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       InkWell(
@@ -316,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               video['channelProfilePic'] ?? '',
                               Text(
                                 '${video['channelName']} • ${video['clicks']} Clicks • ${_formatPublishedAt(video['publishedAt'] ?? '')}',
-                                style: TextStyle(color: Colors.grey),
+                                style: const TextStyle(color: Colors.grey),
                               ),
                             )),
                       );
