@@ -16,6 +16,8 @@ import '../shared/my_colors.dart';
 import '../widgets/twitch_channel_tile.dart';
 
 class YouTubeChannelsPage extends StatefulWidget {
+  final List<String> selectedPlatforms;
+  YouTubeChannelsPage({required this.selectedPlatforms});
   @override
   _YouTubeChannelsPageState createState() => _YouTubeChannelsPageState();
 }
@@ -33,6 +35,10 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
   LinkedInApiService _linkedInApiService = LinkedInApiService();
   TwitchAuth twitchAuth = TwitchAuth();
   String selectedPlatform = 'YouTube';
+  List youtubeChannels = [];
+  List instagramChannels = [];
+  List twitchChannels = [];
+  List linkedInChannels = [];
 
   @override
   void initState() {
@@ -125,47 +131,73 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
   Future<void> _loadChannels() async {
     setState(() => isLoading = true);
     try {
-      if (selectedPlatform == 'YouTube') {
+      // Clear previous channels
+      youtubeChannels.clear();
+      instagramChannels.clear();
+      twitchChannels.clear();
+      linkedInChannels.clear();
+
+      if (widget.selectedPlatforms.contains('YouTube')) {
         final loadedChannels = await _youTubeApiService.getSubscribedChannels();
         setState(() {
-          channels = loadedChannels;
-          filteredChannels = loadedChannels;
-          isLoading = false;
-        });
-      } else if (selectedPlatform == 'Instagram') {
-        setState(() {
-          channels = [];
-          filteredChannels = channels;
-          isLoading = false;
-        });
-      } else if (selectedPlatform == 'Twitch') {
-        _authenticateWithTwitch();
-        await _twitchApiService.authenticate(context);
-        final followedChannels = await _twitchApiService.getFollowedChannels();
-        setState(() {
-          channels = followedChannels;
-          filteredChannels = followedChannels;
-          isLoading = false;
-        });
-      } else if (selectedPlatform == 'LinkedIn') {
-        await _linkedInApiService.authenticate();
-        final followedAccounts =
-            await _linkedInApiService.getFollowedAccounts();
-
-        setState(() {
-          channels = followedAccounts;
-          filteredChannels = followedAccounts;
-          isLoading = false;
+          youtubeChannels.addAll(loadedChannels);
         });
       }
+      if (widget.selectedPlatforms.contains('Instagram')) {
+        final instagramChannels =
+            await _instagramApiService.getInstagramChannels();
+        setState(() {
+          instagramChannels.addAll(instagramChannels);
+        });
+      }
+      if (widget.selectedPlatforms.contains('Twitch')) {
+        await _twitchApiService.authenticate(context);
+        final twitchChannels = await _twitchApiService.getFollowedChannels();
+        setState(() {
+          twitchChannels.addAll(twitchChannels);
+        });
+      }
+      if (widget.selectedPlatforms.contains('LinkedIn')) {
+        await _linkedInApiService.authenticate();
+        final linkedInChannels =
+            await _linkedInApiService.getFollowedAccounts();
+        setState(() {
+          linkedInChannels.addAll(linkedInChannels);
+        });
+      }
+
+      // Update filteredChannels based on the selectedPlatform
+      _updateFilteredChannels();
+
+      setState(() {
+        isLoading = false;
+      });
     } catch (e) {
       print('Error loading channels: $e');
       setState(() {
         isLoading = false;
       });
-      // Show an error message to the user
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading the channels: $e')));
+    }
+  }
+
+  void _updateFilteredChannels() {
+    switch (selectedPlatform) {
+      case 'YouTube':
+        filteredChannels = youtubeChannels;
+        break;
+      case 'Instagram':
+        filteredChannels = instagramChannels;
+        break;
+      case 'Twitch':
+        filteredChannels = twitchChannels;
+        break;
+      case 'LinkedIn':
+        filteredChannels = linkedInChannels;
+        break;
+      default:
+        filteredChannels = [];
     }
   }
 
@@ -184,8 +216,16 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
       selectedPlatform = platform;
       isAuthenticated = false; // Reset authentication state
     });
-    _loadChannels();
+    _updateFilteredChannels();
   }
+
+  // void _onPlatformSelected(String platform) async {
+  //   setState(() {
+  //     selectedPlatform = platform;
+  //     isAuthenticated = false; // Reset authentication state
+  //   });
+  //   _loadChannels();
+  // }
 
   void _toggleChannelSelection(Channel channel) {
     setState(() {
@@ -354,6 +394,10 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
   }
 
   Widget _buildPlatformButton(String platform, String iconPath) {
+    // Only show the button if the platform is in the selectedPlatforms list
+    if (!widget.selectedPlatforms.contains(platform)) {
+      return SizedBox.shrink();
+    }
     return GestureDetector(
       onTap: () => _onPlatformSelected(platform),
       child: Container(

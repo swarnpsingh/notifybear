@@ -13,6 +13,7 @@ class AddPlatforms extends StatefulWidget {
 }
 
 class _AddPlatformsState extends State<AddPlatforms> {
+  List<String> selectedPlatforms = [];
   List<SocialPlatform> displayedPlatforms = [];
   TwitchApiService twitchApiService = TwitchApiService();
   TextEditingController searchController = TextEditingController();
@@ -110,7 +111,17 @@ class _AddPlatformsState extends State<AddPlatforms> {
                     itemCount: displayedPlatforms.length,
                     itemBuilder: (context, index) {
                       return InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          setState(() {
+                            String platformName =
+                                displayedPlatforms[index].name;
+                            if (selectedPlatforms.contains(platformName)) {
+                              selectedPlatforms.remove(platformName);
+                            } else {
+                              selectedPlatforms.add(platformName);
+                            }
+                          });
+                        },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -118,7 +129,10 @@ class _AddPlatformsState extends State<AddPlatforms> {
                               width: 100,
                               height: 100,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: selectedPlatforms.contains(
+                                        displayedPlatforms[index].name)
+                                    ? Colors.blue
+                                    : Colors.white,
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Column(
@@ -156,7 +170,9 @@ class _AddPlatformsState extends State<AddPlatforms> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => YouTubeChannelsPage()));
+                              builder: (context) => YouTubeChannelsPage(
+                                    selectedPlatforms: selectedPlatforms,
+                                  )));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,

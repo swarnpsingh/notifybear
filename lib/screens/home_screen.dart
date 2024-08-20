@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../firestore/platforms_data.dart';
 import '../models/channel.dart';
 import '../services/youtube_api_service.dart';
 import '../shared/my_colors.dart';
@@ -19,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<String> selectedPlatforms = [];
   late SharedPreferences prefs;
   List<Channel> selectedChannels = [];
   List<Map<String, dynamic>> latestVideos = [];
@@ -30,6 +32,26 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _initPrefs();
     _fetchSelectedChannels();
+    _loadSelectedPlatforms();
+  }
+
+  Future<void> _loadSelectedPlatforms() async {
+    try {
+      final platformsData = PlatformsData();
+      final platforms = await platformsData.fetchSelectedPlatforms();
+
+      setState(() {
+        selectedPlatforms = platforms;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching selected platforms: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching selected platforms: $e')));
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _initPrefs() async {
@@ -233,7 +255,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => YouTubeChannelsPage()),
+                                  builder: (context) => YouTubeChannelsPage(
+                                        selectedPlatforms: selectedPlatforms,
+                                      )),
                             );
                           },
                           child: const Padding(
@@ -252,12 +276,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       } else {
                         final channel = selectedChannels[index - 1];
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: CircleAvatar(
-                            radius: 33,
-                            backgroundImage: NetworkImage(channel.imageUrl),
-                          ),
-                        );
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: CircleAvatar(
+                              radius: 33,
+                              backgroundImage: NetworkImage(channel.imageUrl),
+                            ));
                       }
                     },
                   ),
