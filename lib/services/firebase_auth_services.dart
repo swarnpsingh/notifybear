@@ -110,12 +110,16 @@ class FirebaseAuthServices {
           }
         }
 
-        // Store user info in Firestore (as you were doing before)
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'username': user.displayName,
-          'email': user.email,
-          // You can add more fields as needed
-        });
+        // Store user info in Firestore (preserving existing fields)
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
+            {
+              'username': user.displayName,
+              'email': user.email,
+              // You can add more fields as needed
+            },
+            SetOptions(
+                merge:
+                    true)); // Using merge: true to preserve existing fields like selectedChannels
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Sign in successful!')),

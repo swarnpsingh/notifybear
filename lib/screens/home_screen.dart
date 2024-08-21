@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../firestore/platforms_data.dart';
 import '../models/channel.dart';
+import '../services/channel_service.dart';
 import '../services/youtube_api_service.dart';
 import '../shared/my_colors.dart';
 import '../widgets/side_menu_panel.dart';
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> latestVideos = [];
   bool isLoading = true;
   final PanelController _panelController = PanelController();
-
+  ChannelService _channelService = ChannelService();
   @override
   void initState() {
     super.initState();
@@ -250,7 +251,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       if (index == 0) {
                         return GestureDetector(
-                          onTap: () {
+                          onTap: () async {
+                            await _fetchSelectedChannels(); // Ensure channels are fetched
                             // Navigate to the add channel page
                             Navigator.push(
                               context,
@@ -275,6 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       } else {
                         final channel = selectedChannels[index - 1];
+
                         return Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 8.0),

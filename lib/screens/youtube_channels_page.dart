@@ -49,6 +49,7 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
     _authenticateWithLinkedIn();
     _authenticateWithTwitch();
     _loadSelectedChannels();
+    _loadChannels();
   }
 
   Future<void> _loadSelectedChannels() async {
@@ -183,49 +184,47 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
   }
 
   void _updateFilteredChannels() {
-    switch (selectedPlatform) {
-      case 'YouTube':
-        filteredChannels = youtubeChannels;
-        break;
-      case 'Instagram':
-        filteredChannels = instagramChannels;
-        break;
-      case 'Twitch':
-        filteredChannels = twitchChannels;
-        break;
-      case 'LinkedIn':
-        filteredChannels = linkedInChannels;
-        break;
-      default:
-        filteredChannels = [];
-    }
+    setState(() {
+      switch (selectedPlatform) {
+        case 'YouTube':
+          filteredChannels = List.from(youtubeChannels);
+          break;
+        case 'Instagram':
+          filteredChannels = List.from(instagramChannels);
+          break;
+        case 'Twitch':
+          filteredChannels = List.from(twitchChannels);
+          break;
+        case 'LinkedIn':
+          filteredChannels = List.from(linkedInChannels);
+          break;
+        default:
+          filteredChannels = [];
+      }
+    });
+    _filterChannels(); // Apply any existing search query
   }
 
   void _filterChannels() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      filteredChannels = channels.where((channel) {
-        final channelName = channel.name.toLowerCase();
-        return channelName.contains(query);
-      }).toList();
+      filteredChannels = filteredChannels
+          .where((channel) => channel.name.toLowerCase().contains(query)
+              // final channelName = channel.name.toLowerCase().contains(query);
+              // return channelName.contains(query);
+              )
+          .toList();
     });
   }
 
-  void _onPlatformSelected(String platform) async {
+  void _onPlatformSelected(String platform) {
     setState(() {
       selectedPlatform = platform;
       isAuthenticated = false; // Reset authentication state
     });
     _updateFilteredChannels();
+    _searchController.clear(); // Clear the search query when changing platforms
   }
-
-  // void _onPlatformSelected(String platform) async {
-  //   setState(() {
-  //     selectedPlatform = platform;
-  //     isAuthenticated = false; // Reset authentication state
-  //   });
-  //   _loadChannels();
-  // }
 
   void _toggleChannelSelection(Channel channel) {
     setState(() {
@@ -289,6 +288,7 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
             padding: const EdgeInsets.all(18),
             child: TextField(
               controller: _searchController,
+              onChanged: (_) => _filterChannels(),
               decoration: InputDecoration(
                 hintText: 'Search Creators',
                 hintStyle: TextStyle(color: Colors.grey[600]),
