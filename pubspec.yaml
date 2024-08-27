@@ -54,6 +54,7 @@ dependencies:
   fluentui_system_icons: ^1.1.251
   image_picker: ^1.1.2
   cached_network_image: ^3.4.0
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:

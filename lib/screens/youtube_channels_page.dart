@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:notifybear/screens/welcome_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/channel.dart';
@@ -13,6 +14,7 @@ import '../services/twitch_api_service.dart';
 import '../services/twitch_auth.dart';
 import '../services/youtube_api_service.dart';
 import '../shared/my_colors.dart';
+import '../state_management/channel_provider.dart';
 import '../widgets/twitch_channel_tile.dart';
 
 class YouTubeChannelsPage extends StatefulWidget {
@@ -33,6 +35,7 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
   InstagramApiService _instagramApiService = InstagramApiService();
   TwitchApiService _twitchApiService = TwitchApiService();
   LinkedInApiService _linkedInApiService = LinkedInApiService();
+  ChannelProvider channelProvider = ChannelProvider();
   TwitchAuth twitchAuth = TwitchAuth();
   String selectedPlatform = 'YouTube';
   List youtubeChannels = [];
@@ -43,13 +46,13 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
   @override
   void initState() {
     super.initState();
+
     _loadChannels();
     _searchController.addListener(_filterChannels);
     //_linkedInApiService.authenticate();
     _authenticateWithLinkedIn();
     _authenticateWithTwitch();
     _loadSelectedChannels();
-    _loadChannels();
   }
 
   Future<void> _loadSelectedChannels() async {
@@ -89,8 +92,7 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
       if (accessToken != null) {
         setState(() {
           isAuthenticated = true;
-        });
-        _loadChannels(); // Load LinkedIn accounts after authentication
+        }); // Load LinkedIn accounts after authentication
       }
     } catch (e) {
       print('LinkedIn authentication failed: $e');
@@ -106,13 +108,14 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
         setState(() {
           isAuthenticated = true;
         });
-        _loadChannels();
+        // _loadChannels();
       }
     } catch (e) {
       print('twitch authentication failed: $e');
       // Handle authentication failure here
     }
   }
+
   // Future<void> authenticate() async {
   //   try {
   //     bool success = await _twitchApiService.authenticate(context);
@@ -128,7 +131,7 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
   //     return false;
   //   }
   // }
-
+  //
   Future<void> _loadChannels() async {
     setState(() => isLoading = true);
     try {
@@ -183,24 +186,48 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
     }
   }
 
+  // void _updateFilteredChannels() {
+  //   setState(() {
+  //     switch (selectedPlatform) {
+  //       case 'YouTube':
+  //         filteredChannels = List.from(youtubeChannels);
+  //         break;
+  //       case 'Instagram':
+  //         filteredChannels = List.from(instagramChannels);
+  //         break;
+  //       case 'Twitch':
+  //         filteredChannels = List.from(twitchChannels);
+  //         break;
+  //       case 'LinkedIn':
+  //         filteredChannels = List.from(linkedInChannels);
+  //         break;
+  //       default:
+  //         filteredChannels = [];
+  //     }
+  //   });
+  //   _filterChannels(); // Apply any existing search query
+  // }
+
   void _updateFilteredChannels() {
+    List tempFilteredChannels;
+    switch (selectedPlatform) {
+      case 'YouTube':
+        tempFilteredChannels = List.from(youtubeChannels);
+        break;
+      case 'Instagram':
+        tempFilteredChannels = List.from(instagramChannels);
+        break;
+      case 'Twitch':
+        tempFilteredChannels = List.from(twitchChannels);
+        break;
+      case 'LinkedIn':
+        tempFilteredChannels = List.from(linkedInChannels);
+        break;
+      default:
+        tempFilteredChannels = [];
+    }
     setState(() {
-      switch (selectedPlatform) {
-        case 'YouTube':
-          filteredChannels = List.from(youtubeChannels);
-          break;
-        case 'Instagram':
-          filteredChannels = List.from(instagramChannels);
-          break;
-        case 'Twitch':
-          filteredChannels = List.from(twitchChannels);
-          break;
-        case 'LinkedIn':
-          filteredChannels = List.from(linkedInChannels);
-          break;
-        default:
-          filteredChannels = [];
-      }
+      filteredChannels = tempFilteredChannels;
     });
     _filterChannels(); // Apply any existing search query
   }
@@ -262,6 +289,7 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final channelProvider = Provider.of<ChannelProvider>(context);
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(

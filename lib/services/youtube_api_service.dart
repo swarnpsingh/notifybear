@@ -17,6 +17,9 @@ class YouTubeApiService {
   );
 
   Future<List<Channel>> getSubscribedChannels() async {
+    List<Channel> allChannels = [];
+    String? nextPageToken;
+
     try {
       final GoogleSignInAccount? account = await _googleSignIn.signIn();
       if (account == null) {
@@ -30,27 +33,74 @@ class YouTubeApiService {
         throw Exception('Failed to get access token');
       }
 
-      final response = await http.get(
-        Uri.parse(
-            'https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
+      do {
+        final response = await http.get(
+          Uri.parse(
+              'https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50&pageToken=${nextPageToken ?? ''}'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        );
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return (data['items'] as List)
-            .map((item) => Channel.fromJson(item['snippet']))
-            .toList();
-      } else {
-        throw Exception('Failed to load channels');
-      }
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+
+          // Add the fetched channels to the list
+          final fetchedChannels = (data['items'] as List)
+              .map((item) => Channel.fromJson(item['snippet']))
+              .toList();
+          allChannels.addAll(fetchedChannels);
+
+          // Update the nextPageToken
+          nextPageToken = data['nextPageToken'];
+        } else {
+          throw Exception('Failed to load channels');
+        }
+      } while (nextPageToken != null);
+
+      return allChannels;
     } catch (e) {
       print('Error: $e');
       return [];
     }
   }
+
+  // Future<List<Channel>> getSubscribedChannels() async {
+  //   try {
+  //     final GoogleSignInAccount? account = await _googleSignIn.signIn();
+  //     if (account == null) {
+  //       throw Exception('Sign in failed');
+  //     }
+  //
+  //     final GoogleSignInAuthentication auth = await account.authentication;
+  //     final String? token = auth.accessToken;
+  //
+  //     if (token == null) {
+  //       throw Exception('Failed to get access token');
+  //     }
+  //
+  //     final response = await http.get(
+  //       Uri.parse(
+  //           'https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50'),
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //
+  //       return (data['items'] as List)
+  //           .map((item) => Channel.fromJson(item['snippet']))
+  //           .toList();
+  //     } else {
+  //       throw Exception('Failed to load channels');
+  //     }
+  //   } catch (e) {
+  //     print('Error: $e');
+  //     return [];
+  //   }
+  // }
 
   Future<List<Map<String, dynamic>>> fetchLatestVideos(
       List<Channel> channels) async {
