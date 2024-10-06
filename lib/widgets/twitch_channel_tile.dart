@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:notifybear/models/twitch_followed_channel.dart';
 
 class TwitchChannelTile extends StatelessWidget {
-  final TwitchFollowedChannel twitchFollowedChannel;
+  final TwitchFollowedChannel? twitchFollowedChannel;
   final VoidCallback onAdd;
   final String platform;
 
   TwitchChannelTile(
-      {required this.twitchFollowedChannel,
+      {this.twitchFollowedChannel,
       required this.onAdd,
       required this.platform});
 
@@ -26,12 +26,12 @@ class TwitchChannelTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 25.0,
-            backgroundImage: NetworkImage(twitchFollowedChannel.imageUrl),
+            backgroundImage: NetworkImage(twitchFollowedChannel!.imageUrl),
           ),
           SizedBox(width: 15.0),
           Expanded(
             child: Text(
-              twitchFollowedChannel.name,
+              twitchFollowedChannel!.name,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16.0,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:notifybear/screens/coming_soon.dart';
 import 'package:notifybear/widgets/custom_drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -153,9 +154,33 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         SizedBox(height: 20),
                         _buildMenuItem('Manage Creators', Icons.people),
-                        _buildMenuItem('Your Activity', Icons.chat_bubble),
-                        _buildMenuItem('Rewards and Badges', Icons.star),
-                        _buildMenuItem('Refer a friend', Icons.person_add),
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ComingSoon()));
+                            },
+                            child: _buildMenuItem(
+                                'Your Activity', Icons.chat_bubble)),
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ComingSoon()));
+                            },
+                            child: _buildMenuItem(
+                                'Rewards and Badges', Icons.star)),
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ComingSoon()));
+                            },
+                            child: _buildMenuItem(
+                                'Refer a friend', Icons.person_add)),
                         SizedBox(height: 10),
                         Divider(color: Colors.white24),
                         SizedBox(height: 10),
@@ -211,7 +236,6 @@ class _ProfilePageState extends State<ProfilePage> {
         leading: Icon(icon, color: Colors.white),
         title: Text(title, style: TextStyle(color: Colors.white)),
         trailing: Icon(Icons.chevron_right, color: Colors.white),
-        onTap: () {},
       ),
     );
   }

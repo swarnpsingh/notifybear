@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:notifybear/screens/creators_page.dart';
+import 'package:notifybear/screens/shopping_cart.dart';
 import 'package:notifybear/screens/youtube_channels_page.dart';
 import 'package:notifybear/widgets/custom_drawer.dart';
 import 'package:notifybear/widgets/latest_video_tile.dart';
@@ -8,7 +10,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../firestore/platforms_data.dart';
 import '../models/channel.dart';
 import '../services/channel_service.dart';
 import '../services/youtube_api_service.dart';
@@ -27,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> latestVideos = [];
   bool isLoading = true;
   final PanelController _panelController = PanelController();
-  ChannelService _channelService = ChannelService();
+  ChannelService channelService = ChannelService();
   @override
   void initState() {
     super.initState();
@@ -36,11 +37,23 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadSelectedPlatforms();
   }
 
+  Future<void> _fetchSelectedChannels() async {
+    try {
+      final loadedChannels = await channelService.fetchSelectedChannels();
+      setState(() {
+        selectedChannels = loadedChannels;
+      });
+      await fetchLatestVideos();
+    } catch (e) {
+      print('Error fetching selected channels: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching selected channels: $e')));
+    }
+  }
+
   Future<void> _loadSelectedPlatforms() async {
     try {
-      final platformsData = PlatformsData();
-      final platforms = await platformsData.fetchSelectedPlatforms();
-
+      final platforms = await channelService.loadSelectedPlatforms();
       setState(() {
         selectedPlatforms = platforms;
         isLoading = false;
@@ -49,57 +62,10 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Error fetching selected platforms: $e');
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error fetching selected platforms: $e')));
-      setState(() {
-        isLoading = false;
-      });
     }
   }
 
-  Future<void> _initPrefs() async {
-    prefs = await SharedPreferences.getInstance();
-  }
-
-  Future<void> _fetchSelectedChannels() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('user_id');
-
-      if (userId == null) {
-        throw 'User ID is null';
-      }
-
-      final DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
-
-      if (userDoc.exists) {
-        final channelData = userDoc['selectedChannels'] as List<dynamic>?;
-
-        if (channelData == null) {
-          throw 'Channel data is null';
-        }
-
-        final List<Channel> loadedChannels =
-            channelData.map((data) => Channel.fromMap(data)).toList();
-
-        setState(() {
-          selectedChannels = loadedChannels;
-        });
-
-        await _fetchLatestVideos();
-      }
-    } catch (e) {
-      print('Error fetching selected channels: $e');
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error fetching selected channels: $e')));
-    }
-  }
-
-  Future<void> _fetchLatestVideos() async {
+  Future<void> fetchLatestVideos() async {
     try {
       final youtubeService = YouTubeApiService();
       final videos = await youtubeService.fetchLatestVideos(selectedChannels);
@@ -120,6 +86,29 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error fetching latest videos: $e')));
     }
+  }
+  //
+  // Future<void> _loadSelectedPlatforms() async {
+  //   try {
+  //     final platformsData = PlatformsData();
+  //     final platforms = await platformsData.fetchSelectedPlatforms();
+  //
+  //     setState(() {
+  //       selectedPlatforms = platforms;
+  //       isLoading = false;
+  //     });
+  //   } catch (e) {
+  //     print('Error fetching selected platforms: $e');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Error fetching selected platforms: $e')));
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+
+  Future<void> _initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
   Future<void> _handleVideoClick(String videoId, String videoUrl) async {
@@ -239,6 +228,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       iconSize: 35,
                       onPressed: () {
                         // Implement cart button functionality
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ShoppingCart()));
                       },
                     ),
                   ],
@@ -252,7 +245,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (index == 0) {
                         return GestureDetector(
                           onTap: () async {
-                            await _fetchSelectedChannels(); // Ensure channels are fetched
+                            await channelService
+                                .fetchSelectedChannels(); // Ensure channels are fetched
                             // Navigate to the add channel page
                             Navigator.push(
                               context,
@@ -278,13 +272,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       } else {
                         final channel = selectedChannels[index - 1];
 
-                        return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: CircleAvatar(
-                              radius: 33,
-                              backgroundImage: NetworkImage(channel.imageUrl),
-                            ));
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CreatorPage()));
+                          },
+                          child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: CircleAvatar(
+                                radius: 33,
+                                backgroundImage: NetworkImage(channel.imageUrl),
+                              )),
+                        );
                       }
                     },
                   ),

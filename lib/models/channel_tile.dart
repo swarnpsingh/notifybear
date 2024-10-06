@@ -4,11 +4,10 @@ import 'channel.dart';
 
 class ChannelTile extends StatelessWidget {
   final Channel channel;
-  final VoidCallback onAdd;
+  final VoidCallback? onAdd;
   final String platform;
 
-  ChannelTile(
-      {required this.channel, required this.onAdd, required this.platform});
+  ChannelTile({required this.channel, this.onAdd, required this.platform});
 
   @override
   Widget build(BuildContext context) {
@@ -37,15 +36,21 @@ class ChannelTile extends StatelessWidget {
               ),
             ),
           ),
-          Container(
+          // Conditionally render the add button only if onAdd is not null
+          if (onAdd != null)
+            Container(
               decoration: BoxDecoration(
-                  color: Colors.blue, borderRadius: BorderRadius.circular(10)),
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(10),
+              ),
               child: IconButton(
-                  icon: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                  ),
-                  onPressed: onAdd))
+                icon: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: onAdd,
+              ),
+            ),
         ],
       ),
     );

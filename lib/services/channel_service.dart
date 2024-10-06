@@ -2,9 +2,55 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../firestore/platforms_data.dart';
 import '../models/channel.dart';
 
 class ChannelService {
+  Future<List<Channel>> fetchSelectedChannels() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+
+      if (userId == null) {
+        throw 'User ID is null';
+      }
+
+      final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        final channelData = userDoc['selectedChannels'] as List<dynamic>?;
+
+        if (channelData == null) {
+          throw 'Channel data is null';
+        }
+
+        final List<Channel> loadedChannels =
+            channelData.map((data) => Channel.fromMap(data)).toList();
+
+        return loadedChannels;
+      } else {
+        throw 'User document does not exist';
+      }
+    } catch (e) {
+      print('Error fetching selected channels: $e');
+      throw e;
+    }
+  }
+
+  Future<List<String>> loadSelectedPlatforms() async {
+    try {
+      final platformsData = PlatformsData();
+      final platforms = await platformsData.fetchSelectedPlatforms();
+      return platforms;
+    } catch (e) {
+      print('Error fetching selected platforms: $e');
+      throw e;
+    }
+  }
+
   Future<void> toggleChannelSelection(
       Channel channel, BuildContext context) async {
     try {

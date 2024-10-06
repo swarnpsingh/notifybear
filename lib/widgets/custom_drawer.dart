@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:notifybear/screens/bear_shop.dart';
+import 'package:notifybear/screens/your_creators_page.dart';
 
 import '../shared/my_colors.dart';
 import '../shared/my_styles.dart';
@@ -48,8 +50,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 _selectedDrawerIndex = 1;
               });
               // Handle the navigation
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Scaffold()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => YourCreatorsPage()));
             },
           ),
           ListTile(
@@ -79,7 +81,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               });
               // Handle the navigation
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Scaffold()));
+                  context, MaterialPageRoute(builder: (context) => BearShop()));
             },
           ),
           ListTile(

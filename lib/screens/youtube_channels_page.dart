@@ -15,6 +15,7 @@ import '../services/twitch_auth.dart';
 import '../services/youtube_api_service.dart';
 import '../shared/my_colors.dart';
 import '../state_management/channel_provider.dart';
+import '../widgets/platform_button.dart';
 import '../widgets/twitch_channel_tile.dart';
 
 class YouTubeChannelsPage extends StatefulWidget {
@@ -336,11 +337,30 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                _buildPlatformButton('YouTube', 'assets/youtube.png'),
-                _buildPlatformButton('Instagram', 'assets/instagram.png'),
-                _buildPlatformButton('Twitch', 'assets/twitch.png'),
-                _buildPlatformButton(
-                    'LinkedIn', 'assets/linkedin.png'), // Add LinkedIn button
+                PlatformButton(
+                  platform: 'YouTube',
+                  iconPath: 'assets/youtube.png',
+                  isSelected: selectedPlatform == 'YouTube',
+                  onPressed: () => _onPlatformSelected('YouTube'),
+                ),
+                PlatformButton(
+                  platform: 'Instagram',
+                  iconPath: 'assets/instagram.png',
+                  isSelected: selectedPlatform == 'Instagram',
+                  onPressed: () => _onPlatformSelected('Instagram'),
+                ),
+                PlatformButton(
+                  platform: 'Twitch',
+                  iconPath: 'assets/twitch.png',
+                  isSelected: selectedPlatform == 'Twitch',
+                  onPressed: () => _onPlatformSelected('Twitch'),
+                ),
+                PlatformButton(
+                  platform: 'LinkedIn',
+                  iconPath: 'assets/linkedin.png',
+                  isSelected: selectedPlatform == 'LinkedIn',
+                  onPressed: () => _onPlatformSelected('LinkedIn'),
+                ), // Add LinkedIn button
               ],
             ),
           ),
@@ -421,45 +441,45 @@ class _YouTubeChannelsPageState extends State<YouTubeChannelsPage> {
     );
   }
 
-  Widget _buildPlatformButton(String platform, String iconPath) {
-    // Only show the button if the platform is in the selectedPlatforms list
-    if (!widget.selectedPlatforms.contains(platform)) {
-      return SizedBox.shrink();
-    }
-    return GestureDetector(
-      onTap: () => _onPlatformSelected(platform),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        margin: EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          color: selectedPlatform == platform
-              ? Colors.blue
-              : Color.fromRGBO(16, 19, 28, 1),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          children: [
-            Image.asset(
-              iconPath,
-              height: 22,
-              width: 22,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Text(
-              platform,
-              style: TextStyle(
-                color:
-                    selectedPlatform == platform ? Colors.black : Colors.white,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget buildPlatformButton(String platform, String iconPath) {
+  //   // Only show the button if the platform is in the selectedPlatforms list
+  //   if (!widget.selectedPlatforms.contains(platform)) {
+  //     return SizedBox.shrink();
+  //   }
+  //   return GestureDetector(
+  //     onTap: () => _onPlatformSelected(platform),
+  //     child: Container(
+  //       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  //       margin: EdgeInsets.symmetric(horizontal: 8),
+  //       decoration: BoxDecoration(
+  //         color: selectedPlatform == platform
+  //             ? Colors.blue
+  //             : Color.fromRGBO(16, 19, 28, 1),
+  //         borderRadius: BorderRadius.circular(20),
+  //       ),
+  //       child: Row(
+  //         children: [
+  //           Image.asset(
+  //             iconPath,
+  //             height: 22,
+  //             width: 22,
+  //           ),
+  //           SizedBox(
+  //             width: 10,
+  //           ),
+  //           Text(
+  //             platform,
+  //             style: TextStyle(
+  //               color:
+  //                   selectedPlatform == platform ? Colors.black : Colors.white,
+  //               fontSize: 16,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   void dispose() {
